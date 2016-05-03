@@ -8,7 +8,7 @@ use rand::distributions::{IndependentSample, Range};
 use std::fs::File;
 use std::io::{self, Write};
 
-struct Bandit {
+struct EpsilonGreedyBandit {
     // number of arms
     n: usize,
 
@@ -23,14 +23,14 @@ struct Bandit {
     epsilon: f64,
 }
 
-impl Bandit {
-    fn new(n: usize, epsilon: f64) -> Bandit {
+impl EpsilonGreedyBandit {
+    fn new(n: usize, epsilon: f64) -> EpsilonGreedyBandit {
         let mut past_rewards = Vec::new();
         for _ in 0..n {
             past_rewards.push(vec![]);
         }
 
-        Bandit {
+        EpsilonGreedyBandit {
             n: n,
             past_rewards: past_rewards,
             epsilon: epsilon,
@@ -130,7 +130,7 @@ impl BanditTask {
     }
 
     // Returns vector of the reward at each stage
-    fn run_task(&mut self, bandit: &mut Bandit, num_plays: usize) -> Vec<f64> {
+    fn run_task(&mut self, bandit: &mut EpsilonGreedyBandit, num_plays: usize) -> Vec<f64> {
         let mut rng = rand::thread_rng();
         let mut rewards = vec![];
 
@@ -177,7 +177,7 @@ fn main() {
     let n = 10;
     let num_tasks = 2000;
     let num_plays = 1000;
-    let epsilon = 0.1;
+    let epsilon = 0.2;
 
     let mut avg_rewards = vec![];
     for _ in 0..num_plays {
@@ -187,7 +187,7 @@ fn main() {
     for i in 0..num_tasks {
         println!("Task #{}", i);
         let mut task = BanditTask::new(n);
-        let mut bandit = Bandit::new(n, epsilon);
+        let mut bandit = EpsilonGreedyBandit::new(n, epsilon);
         let rewards = task.run_task(&mut bandit, num_plays);
 
         for i in 0..num_plays {
@@ -199,5 +199,5 @@ fn main() {
         avg_rewards[i] /= num_plays as f64;
     }
 
-    dump_vec_to_file(&avg_rewards, "eps_0_1.dat");
+    dump_vec_to_file(&avg_rewards, "eps_0_2.dat");
 }
